@@ -80,7 +80,7 @@ namespace EventBus.SubscriptionManager
             return GetHandlersForEvent(eventName);
         }
 
-        private IEnumerable<SubscriptionInfo> GetHandlersForEvent(string eventName) =>  _handlers[eventName];
+        public IEnumerable<SubscriptionInfo> GetHandlersForEvent(string eventName) =>  _handlers[eventName];
 
         public bool HasSubscriptionsForEvent<T>() where T : IntegrationEvent
         {
@@ -88,7 +88,7 @@ namespace EventBus.SubscriptionManager
             return HasSubscriptionsForEvent(eventName);
         }
 
-        private bool HasSubscriptionsForEvent(string eventName) => _handlers.ContainsKey(eventName);
+        public bool HasSubscriptionsForEvent(string eventName) => _handlers.ContainsKey(eventName);
 
         private void RaiseOnEventRemoved(string eventName)
         {
