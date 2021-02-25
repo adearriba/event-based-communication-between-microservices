@@ -23,6 +23,8 @@ namespace EventBus.SubscriptionManager
         IEnumerable<SubscriptionInfo> GetHandlersForEvent<T>() where T : IntegrationEvent;
         IEnumerable<SubscriptionInfo> GetHandlersForEvent(string eventName);
 
+        Type GetEventTypeByName(string eventName);
+
         bool IsEmpty { get; }
 
         void Clear();

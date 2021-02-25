@@ -22,6 +22,8 @@ namespace EventBus.SubscriptionManager
 
         public string GetEventKey<T>() => typeof(T).Name;
 
+        public Type GetEventTypeByName(string eventName) => _eventTypes.SingleOrDefault(t => t.Name == eventName);
+
         public void AddSubscription<T, TH>()
             where T : IntegrationEvent
             where TH : IIntegrationEventHandler<T>
