@@ -9,9 +9,13 @@ services:
     build:
       context: .
       dockerfile: Services/ConsumerMicroservice/Dockerfile
+    depends_on:
+      - rabbitmq
 
   ProducerMicroservice:
     image: ${REGISTRY:-adearriba}/producer:${PLATFORM:-linux}-${TAG:-latest}
     build:
       context: .
       dockerfile: Services/ProducerMicroservice/Dockerfile
+    depends_on:
+      - rabbitmq
