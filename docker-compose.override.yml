@@ -11,8 +11,8 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://0.0.0.0:80
       - EventBusConnection=${SERVICE_BUS:-rabbitmq}
-      - EventBusUserName=${SERVICE_BUS_USERNAME:-guest}
-      - EventBusPassword=${SERVICE_BUS_PASSWORD:-guest}
+      - EventBusUserName=${SERVICE_BUS_USERNAME}
+      - EventBusPassword=${SERVICE_BUS_PASSWORD}
       - SubscriptionClientName=ConsumerMicroservice
     ports:
       - "5002:80"
@@ -22,8 +22,8 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://0.0.0.0:80
       - EventBusConnection=${SERVICE_BUS:-rabbitmq}
-      - EventBusUserName=${SERVICE_BUS_USERNAME:-guest}
-      - EventBusPassword=${SERVICE_BUS_PASSWORD:-guest}
+      - EventBusUserName=${SERVICE_BUS_USERNAME}
+      - EventBusPassword=${SERVICE_BUS_PASSWORD}
       - SubscriptionClientName=ProducerMicroservice
     ports:
       - "5001:80"
