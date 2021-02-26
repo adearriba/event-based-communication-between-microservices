@@ -1,0 +1,17 @@
+.dockerignore
+.env
+.git
+.gitignore
+.vs
+.vscode
+.md
+docker-compose*.yml
+*.md
+hosts
+LICENSE
+*.testsettings
+**/bin/
+**/obj/
+**/node_modules/
+**/bower_components/
+packages/

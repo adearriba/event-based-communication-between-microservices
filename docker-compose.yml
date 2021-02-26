@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+
+  ConsumerMicroservice:
+    image: ${REGISTRY:-adearriba}/consumer:${PLATFORM:-linux}-${TAG:-latest}
+    build:
+      context: .
+      dockerfile: Services/ConsumerMicroservice/Dockerfile
+
+  ProducerMicroservice:
+    image: ${REGISTRY:-adearriba}/producer:${PLATFORM:-linux}-${TAG:-latest}
+    build:
+      context: .
+      dockerfile: Services/ProducerMicroservice/Dockerfile

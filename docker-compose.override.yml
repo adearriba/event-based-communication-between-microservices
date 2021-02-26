@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  rabbitmq:
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+
+  ConsumerMicroservice:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://0.0.0.0:80
+      - EventBusConnection=${SERVICE_BUS:-rabbitmq}
+      - EventBusUserName=${SERVICE_BUS_USERNAME:-guest}
+      - EventBusPassword=${SERVICE_BUS_PASSWORD:-guest}
+      - SubscriptionClientName=ConsumerMicroservice
+    ports:
+      - "5002:80"
+
+  ProducerMicroservice:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://0.0.0.0:80
+      - EventBusConnection=${SERVICE_BUS:-rabbitmq}
+      - EventBusUserName=${SERVICE_BUS_USERNAME:-guest}
+      - EventBusPassword=${SERVICE_BUS_PASSWORD:-guest}
+      - SubscriptionClientName=ProducerMicroservice
+    ports:
+      - "5001:80"
+      
