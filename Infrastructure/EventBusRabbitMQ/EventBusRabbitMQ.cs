@@ -21,13 +21,13 @@ namespace EventBusRabbitMQ
 {
     public class EventBusRabbitMQ : IEventBus, IDisposable
     {
-        const string BROKER_NAME = "rabbitmq_event_bus";
         const string AUTOFAC_SCOPE_NAME = "rabbitmq_event_bus";
 
         private readonly IRabbitMQPersistentConnection _persistentConnection;
         private readonly ILogger<EventBusRabbitMQ> _logger;
         private readonly IEventBusSubscriptionsManager _subsManager;
         private readonly ILifetimeScope _autofac;
+        private readonly EventBusSettings _settings;
         private readonly int _retryCount;
         private IModel _consumerChannel;
         private string _queueName;
@@ -46,6 +46,7 @@ namespace EventBusRabbitMQ
             _queueName = queueName;
             _autofac = autofac;
             _retryCount = retryCount;
+            _settings = EventBusSettings.GetInstance();
 
             _consumerChannel = CreateConsumerChannel();
             _subsManager.OnEventRemoved += SubsManager_OnEventRemoved;
@@ -76,7 +77,7 @@ namespace EventBusRabbitMQ
             {
                 _logger.LogTrace($"Declaring RabbitMQ exchange to publish event: {@event.Id}");
 
-                channel.ExchangeDeclare(exchange: BROKER_NAME, type: ExchangeType.Direct);
+                channel.ExchangeDeclare(exchange: _settings.DefaultExchangeName, type: ExchangeType.Direct);
                 var message = JsonConvert.SerializeObject(@event);
                 var body = Encoding.UTF8.GetBytes(message);
 
@@ -88,7 +89,7 @@ namespace EventBusRabbitMQ
                     _logger.LogTrace($"Publishing event to RabbitMQ: {@event.Id}");
 
                     channel.BasicPublish(
-                        exchange: BROKER_NAME,
+                        exchange: _settings.DefaultExchangeName,
                         routingKey: eventName,
                         mandatory: true,
                         basicProperties: properties,
@@ -114,7 +115,7 @@ namespace EventBusRabbitMQ
                 using (var channel = _persistentConnection.CreateModel())
                 {
                     channel.QueueBind(queue: _queueName,
-                                      exchange: BROKER_NAME,
+                                      exchange: _settings.DefaultExchangeName,
                                       routingKey: eventName);
                 }
             }
@@ -136,16 +137,8 @@ namespace EventBusRabbitMQ
 
         public void Dispose()
         {
-            if (_consumerChannel != null)
-            {
-                _consumerChannel.Dispose();
-            }
-
-            if (_persistentConnection != null)
-            {
-                _persistentConnection.Dispose();
-            }
-
+            _consumerChannel?.Dispose();
+            _persistentConnection?.Dispose();
             _subsManager.Clear();
         }
 
@@ -159,7 +152,7 @@ namespace EventBusRabbitMQ
             using (var channel = _persistentConnection.CreateModel())
             {
                 channel.QueueUnbind(queue: _queueName,
-                    exchange: BROKER_NAME,
+                    exchange: _settings.DefaultExchangeName,
                     routingKey: eventName);
 
                 if (_subsManager.IsEmpty)
@@ -180,10 +173,10 @@ namespace EventBusRabbitMQ
             _logger.LogTrace("Creating RabbitMQ consumer channel");
 
             var channel = _persistentConnection.CreateModel();
-            channel.ExchangeDeclare(exchange: BROKER_NAME, type: ExchangeType.Direct);
+            channel.ExchangeDeclare(exchange: _settings.DefaultExchangeName, type: ExchangeType.Direct);
 
             IDictionary<String, Object> args = new Dictionary<String, Object>();
-            args.Add("x-dead-letter-exchange", BROKER_NAME);
+            args.Add("x-dead-letter-exchange", _settings.DeadLetterExchangeName);
 
             channel.QueueDeclare(queue: _queueName,
                                  durable: true,
@@ -241,8 +234,8 @@ namespace EventBusRabbitMQ
             }
             catch (Exception ex)
             {
-                _logger.LogWarning(ex, $"----- ERROR Processing message. Requeuing: \"{message}\"");
-                _consumerChannel.BasicNack(eventArgs.DeliveryTag, multiple: false, requeue: true);
+                _logger.LogWarning(ex, $"----- ERROR Processing message: \"{message}\"");
+                _consumerChannel.BasicNack(eventArgs.DeliveryTag, multiple: false, requeue: false);
             }
         }
 
