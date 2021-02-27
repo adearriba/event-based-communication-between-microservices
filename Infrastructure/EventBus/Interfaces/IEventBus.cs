@@ -2,15 +2,8 @@ using EventBus.Events;
 
 namespace EventBus.Interfaces
 {
-    public interface IEventBus
+    public interface IEventBus : IEventBusPublisher, IEventBusSubscriber
     {
-        void Publish(IntegrationEvent @event);
-
-        void Subscribe<T, TH>()
-            where T : IntegrationEvent
-            where TH : IIntegrationEventHandler<T>;
-        void Unsubscribe<T, TH>()
-            where T : IntegrationEvent
-            where TH : IIntegrationEventHandler<T>;
+        
     }
 }
