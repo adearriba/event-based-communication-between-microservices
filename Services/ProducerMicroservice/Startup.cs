@@ -31,7 +31,7 @@ namespace ProducerMicroservice
             services.AddSingleton<IRabbitMQPersistentConnection>(sp => RabbitMQStartup.CreateDefaultPersistentConnection(Configuration, sp));
             
             services.AddSingleton<IEventBusSubscriptionsManager, InMemoryEventBusSubscriptionsManager>();
-            services.AddSingleton<IEventBus>(sp => RabbitMQStartup.CreateEventBus(Configuration, sp));
+            services.AddSingleton<IEventBusPublisher>(sp => RabbitMQStartup.CreateEventBusPublisher(Configuration, sp));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -54,8 +54,6 @@ namespace ProducerMicroservice
             {
                 endpoints.MapControllers();
             });
-
-
         }
     }
 }

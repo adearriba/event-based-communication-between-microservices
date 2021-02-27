@@ -2,6 +2,7 @@ using System;
 using Autofac;
 using EventBus.Interfaces;
 using EventBus.SubscriptionManager;
+using EventBusRabbitMQ;
 using EventBusRabbitMQ.Connections;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,39 +18,21 @@ namespace ProducerMicroservice
         {
             var logger = serviceProvider.GetRequiredService<ILogger<DefaultRabbitMQPersistentConnection>>();
 
-                var factory = new ConnectionFactory()
-                {
-                    HostName = configuration["EventBusConnection"],
-                    DispatchConsumersAsync = true
-                };
+            var factory = new ConnectionFactory()
+            {
+                HostName = configuration["EventBusConnection"],
+                DispatchConsumersAsync = true
+            };
 
-                if (!string.IsNullOrEmpty(configuration["EventBusUserName"]))
-                {
-                    factory.UserName = configuration["EventBusUserName"];
-                }
+            if (!string.IsNullOrEmpty(configuration["EventBusUserName"]))
+            {
+                factory.UserName = configuration["EventBusUserName"];
+            }
 
-                if (!string.IsNullOrEmpty(configuration["EventBusPassword"]))
-                {
-                    factory.Password = configuration["EventBusPassword"];
-                }
-
-                var retryCount = 5;
-                if (!string.IsNullOrEmpty(configuration["EventBusRetryCount"]))
-                {
-                    retryCount = int.Parse(configuration["EventBusRetryCount"]);
-                }
-
-                return new DefaultRabbitMQPersistentConnection(factory, logger, retryCount);
-        }
-
-        public static IEventBus CreateEventBus(
-            IConfiguration configuration, IServiceProvider serviceProvider)
-        {
-            var subscriptionClientName = configuration["SubscriptionClientName"];
-            var rabbitMQPersistentConnection = serviceProvider.GetRequiredService<IRabbitMQPersistentConnection>();
-            var iLifetimeScope = serviceProvider.GetRequiredService<ILifetimeScope>();
-            var logger = serviceProvider.GetRequiredService<ILogger<EventBusRabbitMQ.EventBusRabbitMQ>>();
-            var eventBusSubcriptionsManager = serviceProvider.GetRequiredService<IEventBusSubscriptionsManager>();
+            if (!string.IsNullOrEmpty(configuration["EventBusPassword"]))
+            {
+                factory.Password = configuration["EventBusPassword"];
+            }
 
             var retryCount = 5;
             if (!string.IsNullOrEmpty(configuration["EventBusRetryCount"]))
@@ -57,7 +40,22 @@ namespace ProducerMicroservice
                 retryCount = int.Parse(configuration["EventBusRetryCount"]);
             }
 
-            return new EventBusRabbitMQ.EventBusRabbitMQ(rabbitMQPersistentConnection, logger, iLifetimeScope, eventBusSubcriptionsManager, subscriptionClientName, retryCount);
+            return new DefaultRabbitMQPersistentConnection(factory, logger, retryCount);
+        }
+
+        public static IEventBusPublisher CreateEventBusPublisher(
+            IConfiguration configuration, IServiceProvider serviceProvider)
+        {
+            var rabbitMQPersistentConnection = serviceProvider.GetRequiredService<IRabbitMQPersistentConnection>();
+            var logger = serviceProvider.GetRequiredService<ILogger<EventBusRabbitMQPublisher>>();
+
+            var retryCount = 5;
+            if (!string.IsNullOrEmpty(configuration["EventBusRetryCount"]))
+            {
+                retryCount = int.Parse(configuration["EventBusRetryCount"]);
+            }
+
+            return new EventBusRabbitMQPublisher(rabbitMQPersistentConnection, logger, retryCount);
         }
     }
 }
