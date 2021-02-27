@@ -6,7 +6,8 @@ using EventBus.Interfaces;
 
 namespace EventBus.SubscriptionManager
 {
-    public class InMemoryEventBusSubscriptionsManager : IEventBusSubscriptionsManager
+    public class InMemoryEventBusSubscriptionsManager 
+        : IEventBusSubscriptionsManager, IEventBusDeadLetterSubscriptionsManager
     {
         private readonly Dictionary<string, List<SubscriptionInfo>> _handlers;
         private readonly List<Type> _eventTypes;
