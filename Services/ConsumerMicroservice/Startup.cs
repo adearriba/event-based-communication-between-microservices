@@ -32,9 +32,15 @@ namespace ConsumerMicroservice
             services.AddSingleton<IRabbitMQPersistentConnection>(sp => RabbitMQStartup.CreateDefaultPersistentConnection(Configuration, sp));
             
             services.AddTransient<WeatherForecastRequestedHandler>();
+            services.AddTransient<WeatherForecastRequestedDeadLetterHandler>();
 
             services.AddSingleton<IEventBusSubscriptionsManager, InMemoryEventBusSubscriptionsManager>();
-            services.AddSingleton<IEventBus>(sp => RabbitMQStartup.CreateEventBus(Configuration, sp));
+
+            services.AddSingleton<IEventBusDeadLetterSubscriptionsManager, InMemoryEventBusSubscriptionsManager>();
+
+            services.AddSingleton<IEventBusSubscriber>(sp => RabbitMQStartup.CreateEventBusSubscriber(Configuration, sp));
+
+            services.AddSingleton<IEventBusDeadLetterSubscriber>(sp => RabbitMQStartup.CreateEventBusDeadLetterSubscriber(sp));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -58,7 +64,8 @@ namespace ConsumerMicroservice
                 endpoints.MapControllers();
             });
 
-            RabbitMQStartup.ConfigureEventBus(app);
+            RabbitMQStartup.ConfigureEventBusSubscriber(app);
+            RabbitMQStartup.ConfigureEventBusDeadLetterSubscriber(app);
         }
     }
 }

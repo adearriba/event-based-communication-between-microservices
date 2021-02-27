@@ -4,6 +4,7 @@ using ConsumerMicroservice.IntegrationEvents.EventHandlers;
 using ConsumerMicroservice.IntegrationEvents.Events;
 using EventBus.Interfaces;
 using EventBus.SubscriptionManager;
+using EventBusRabbitMQ;
 using EventBusRabbitMQ.Connections;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
@@ -45,28 +46,38 @@ namespace ConsumerMicroservice
                 return new DefaultRabbitMQPersistentConnection(factory, logger, retryCount);
         }
 
-        public static IEventBus CreateEventBus(
+        public static IEventBusSubscriber CreateEventBusSubscriber(
             IConfiguration configuration, IServiceProvider serviceProvider)
         {
-            var subscriptionClientName = configuration["SubscriptionClientName"];
+            var queueName = configuration["SubscriptionClientName"];
             var rabbitMQPersistentConnection = serviceProvider.GetRequiredService<IRabbitMQPersistentConnection>();
             var iLifetimeScope = serviceProvider.GetRequiredService<ILifetimeScope>();
-            var logger = serviceProvider.GetRequiredService<ILogger<EventBusRabbitMQ.EventBusRabbitMQ>>();
+            var logger = serviceProvider.GetRequiredService<ILogger<EventBusRabbitMQSubscriber>>();
             var eventBusSubcriptionsManager = serviceProvider.GetRequiredService<IEventBusSubscriptionsManager>();
 
-            var retryCount = 5;
-            if (!string.IsNullOrEmpty(configuration["EventBusRetryCount"]))
-            {
-                retryCount = int.Parse(configuration["EventBusRetryCount"]);
-            }
-
-            return new EventBusRabbitMQ.EventBusRabbitMQ(rabbitMQPersistentConnection, logger, iLifetimeScope, eventBusSubcriptionsManager, subscriptionClientName, retryCount);
+            return new EventBusRabbitMQSubscriber(rabbitMQPersistentConnection, logger, iLifetimeScope, eventBusSubcriptionsManager, queueName);
         }
 
-        public static void ConfigureEventBus(IApplicationBuilder app)
+        public static void ConfigureEventBusSubscriber(IApplicationBuilder app)
         {
-            var eventBus = app.ApplicationServices.GetRequiredService<IEventBus>();
+            var eventBus = app.ApplicationServices.GetRequiredService<IEventBusSubscriber>();
             eventBus.Subscribe<WeatherForecastRequestedIntegrationEvent, WeatherForecastRequestedHandler>();
+        }
+
+        public static IEventBusDeadLetterSubscriber CreateEventBusDeadLetterSubscriber(IServiceProvider serviceProvider)
+        {
+            var rabbitMQPersistentConnection = serviceProvider.GetRequiredService<IRabbitMQPersistentConnection>();
+            var iLifetimeScope = serviceProvider.GetRequiredService<ILifetimeScope>();
+            var logger = serviceProvider.GetRequiredService<ILogger<EventBusRabbitMQSubscriber>>();
+            var eventBusSubcriptionsManager = serviceProvider.GetRequiredService<IEventBusDeadLetterSubscriptionsManager>();
+
+            return new EventBusRabbitMQDeadLetterSubscriber(rabbitMQPersistentConnection, logger, iLifetimeScope, eventBusSubcriptionsManager);
+        }
+
+        public static void ConfigureEventBusDeadLetterSubscriber(IApplicationBuilder app)
+        {
+            var eventBus = app.ApplicationServices.GetRequiredService<IEventBusDeadLetterSubscriber>();
+            eventBus.Subscribe<WeatherForecastRequestedIntegrationEvent, WeatherForecastRequestedDeadLetterHandler>();
         }
     }
 }
