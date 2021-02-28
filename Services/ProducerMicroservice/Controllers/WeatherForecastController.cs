@@ -13,7 +13,7 @@ namespace ProducerMicroservice.Controllers
     [Route("[controller]")]
     public class WeatherForecastController : ControllerBase
     {
-        private readonly IEventBus _eventBus;
+        private readonly IEventBusPublisher _eventBus;
         
         private static readonly string[] Summaries = new[]
         {
@@ -22,7 +22,7 @@ namespace ProducerMicroservice.Controllers
 
         private readonly ILogger<WeatherForecastController> _logger;
 
-        public WeatherForecastController(ILogger<WeatherForecastController> logger, IEventBus eventBus)
+        public WeatherForecastController(ILogger<WeatherForecastController> logger, IEventBusPublisher eventBus)
         {
             _logger = logger;
             _eventBus = eventBus;
