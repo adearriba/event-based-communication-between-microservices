@@ -107,6 +107,9 @@ public static void ConfigureEventBusDeadLetterSubscriber(IApplicationBuilder app
 }
 ```
 
+View in the console that ConsumerMicroservice received an error message and handled the dead letter event.
+![Console dead letter logs](https://github.com/adearriba/event-based-communication-between-microservices/blob/05475e1cfaaf0eaca6aea9fdc950e67cadaa7ba8/img/console_events_logs_rejected.png?raw=true "Console dead letter event Log")
+
 ## Inside RabbitMQ
 You can access RabbitMQ web panel using:
 ``http://host.docker.internal:15672/``
