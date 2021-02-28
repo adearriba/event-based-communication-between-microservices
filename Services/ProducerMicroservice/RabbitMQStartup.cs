@@ -2,8 +2,8 @@ using System;
 using Autofac;
 using EventBus.Interfaces;
 using EventBus.SubscriptionManager;
-using EventBusRabbitMQ;
-using EventBusRabbitMQ.Connections;
+using EventBus.RabbitMQ;
+using EventBus.RabbitMQ.Connections;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -47,7 +47,7 @@ namespace ProducerMicroservice
             IConfiguration configuration, IServiceProvider serviceProvider)
         {
             var rabbitMQPersistentConnection = serviceProvider.GetRequiredService<IRabbitMQPersistentConnection>();
-            var logger = serviceProvider.GetRequiredService<ILogger<EventBusRabbitMQPublisher>>();
+            var logger = serviceProvider.GetRequiredService<ILogger<RabbitMQPublisher>>();
 
             var retryCount = 5;
             if (!string.IsNullOrEmpty(configuration["EventBusRetryCount"]))
@@ -55,7 +55,7 @@ namespace ProducerMicroservice
                 retryCount = int.Parse(configuration["EventBusRetryCount"]);
             }
 
-            return new EventBusRabbitMQPublisher(rabbitMQPersistentConnection, logger, retryCount);
+            return new RabbitMQPublisher(rabbitMQPersistentConnection, logger, retryCount);
         }
     }
 }

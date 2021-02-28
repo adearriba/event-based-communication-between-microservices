@@ -1,6 +1,6 @@
 using EventBus.Interfaces;
 using EventBus.SubscriptionManager;
-using EventBusRabbitMQ.Connections;
+using EventBus.RabbitMQ.Connections;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;

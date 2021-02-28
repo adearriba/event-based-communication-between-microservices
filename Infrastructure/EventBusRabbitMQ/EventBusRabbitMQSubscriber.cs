@@ -7,28 +7,28 @@ using EventBus.Events;
 using EventBus.Extensions;
 using EventBus.Interfaces;
 using EventBus.SubscriptionManager;
-using EventBusRabbitMQ.Connections;
+using EventBus.RabbitMQ.Connections;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 
-namespace EventBusRabbitMQ
+namespace EventBus.RabbitMQ
 {
-    public class EventBusRabbitMQSubscriber : IEventBusSubscriber, IDisposable
+    public class RabbitMQSubscriber : IEventBusSubscriber, IDisposable
     {
         const string AUTOFAC_SCOPE_NAME = "rabbitmq_event_bus";
         private readonly IRabbitMQPersistentConnection _persistentConnection;
         private readonly IEventBusSubscriptionsManager _subsManager;
-        private readonly ILogger<EventBusRabbitMQSubscriber> _logger;
+        private readonly ILogger<RabbitMQSubscriber> _logger;
         private readonly ILifetimeScope _autofac;
-        private readonly EventBusSettings _settings;
+        private readonly RabbitMQSettings _settings;
         private IModel _consumerChannel;
         private string _queueName;
 
-        public EventBusRabbitMQSubscriber(
+        public RabbitMQSubscriber(
             IRabbitMQPersistentConnection persistentConnection, 
-            ILogger<EventBusRabbitMQSubscriber> logger,
+            ILogger<RabbitMQSubscriber> logger,
             ILifetimeScope autofac, 
             IEventBusSubscriptionsManager subsManager, 
             string queueName = null)
@@ -39,7 +39,7 @@ namespace EventBusRabbitMQ
 
             _queueName = queueName;
             _autofac = autofac;
-            _settings = EventBusSettings.GetInstance();
+            _settings = RabbitMQSettings.GetInstance();
 
             _consumerChannel = CreateConsumerChannel();
             _subsManager.OnEventRemoved += SubsManager_OnEventRemoved;

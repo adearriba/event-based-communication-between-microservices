@@ -3,7 +3,7 @@ using System.Net.Sockets;
 using System.Text;
 using EventBus.Events;
 using EventBus.Interfaces;
-using EventBusRabbitMQ.Connections;
+using EventBus.RabbitMQ.Connections;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Polly;
@@ -11,20 +11,20 @@ using Polly.Retry;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Exceptions;
 
-namespace EventBusRabbitMQ
+namespace EventBus.RabbitMQ
 {
-    public class EventBusRabbitMQPublisher : IEventBusPublisher, IDisposable
+    public class RabbitMQPublisher : IEventBusPublisher, IDisposable
     {
         private readonly IRabbitMQPersistentConnection _persistentConnection;
-        private readonly ILogger<EventBusRabbitMQPublisher> _logger;
-        private readonly EventBusSettings _settings;
+        private readonly ILogger<RabbitMQPublisher> _logger;
+        private readonly RabbitMQSettings _settings;
         private readonly int _retryCount;
 
-        public EventBusRabbitMQPublisher(IRabbitMQPersistentConnection persistentConnection, ILogger<EventBusRabbitMQPublisher> logger, int retryCount = 5)
+        public RabbitMQPublisher(IRabbitMQPersistentConnection persistentConnection, ILogger<RabbitMQPublisher> logger, int retryCount = 5)
         {
             _persistentConnection = persistentConnection;
             _logger = logger;
-            _settings = EventBusSettings.GetInstance();
+            _settings = RabbitMQSettings.GetInstance();
             _retryCount = retryCount;
         }
 

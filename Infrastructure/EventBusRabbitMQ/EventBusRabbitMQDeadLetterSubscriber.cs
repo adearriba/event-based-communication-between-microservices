@@ -7,27 +7,27 @@ using EventBus.Events;
 using EventBus.Extensions;
 using EventBus.Interfaces;
 using EventBus.SubscriptionManager;
-using EventBusRabbitMQ.Connections;
+using EventBus.RabbitMQ.Connections;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 
-namespace EventBusRabbitMQ
+namespace EventBus.RabbitMQ
 {
-    public class EventBusRabbitMQDeadLetterSubscriber : IEventBusDeadLetterSubscriber, IDisposable
+    public class RabbitMQDeadLetterSubscriber : IEventBusDeadLetterSubscriber, IDisposable
     {
         const string AUTOFAC_SCOPE_NAME = "rabbitmq_deadletter_event_bus";
         private readonly IRabbitMQPersistentConnection _persistentConnection;
         private readonly IEventBusDeadLetterSubscriptionsManager _subsManager;
-        private readonly ILogger<EventBusRabbitMQSubscriber> _logger;
+        private readonly ILogger<RabbitMQSubscriber> _logger;
         private readonly ILifetimeScope _autofac;
-        private readonly EventBusSettings _settings;
+        private readonly RabbitMQSettings _settings;
         private IModel _consumerChannel;
 
-        public EventBusRabbitMQDeadLetterSubscriber(
+        public RabbitMQDeadLetterSubscriber(
             IRabbitMQPersistentConnection persistentConnection, 
-            ILogger<EventBusRabbitMQSubscriber> logger,
+            ILogger<RabbitMQSubscriber> logger,
             ILifetimeScope autofac,
             IEventBusDeadLetterSubscriptionsManager subsManager)
         {
@@ -36,7 +36,7 @@ namespace EventBusRabbitMQ
             _subsManager = subsManager ?? new InMemoryEventBusSubscriptionsManager();
 
             _autofac = autofac;
-            _settings = EventBusSettings.GetInstance();
+            _settings = RabbitMQSettings.GetInstance();
 
             _consumerChannel = CreateConsumerChannel();
             _subsManager.OnEventRemoved += SubsManager_OnEventRemoved;

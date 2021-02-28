@@ -4,8 +4,8 @@ using ConsumerMicroservice.IntegrationEvents.EventHandlers;
 using ConsumerMicroservice.IntegrationEvents.Events;
 using EventBus.Interfaces;
 using EventBus.SubscriptionManager;
-using EventBusRabbitMQ;
-using EventBusRabbitMQ.Connections;
+using EventBus.RabbitMQ;
+using EventBus.RabbitMQ.Connections;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -52,10 +52,10 @@ namespace ConsumerMicroservice
             var queueName = configuration["SubscriptionClientName"];
             var rabbitMQPersistentConnection = serviceProvider.GetRequiredService<IRabbitMQPersistentConnection>();
             var iLifetimeScope = serviceProvider.GetRequiredService<ILifetimeScope>();
-            var logger = serviceProvider.GetRequiredService<ILogger<EventBusRabbitMQSubscriber>>();
+            var logger = serviceProvider.GetRequiredService<ILogger<RabbitMQSubscriber>>();
             var eventBusSubcriptionsManager = serviceProvider.GetRequiredService<IEventBusSubscriptionsManager>();
 
-            return new EventBusRabbitMQSubscriber(rabbitMQPersistentConnection, logger, iLifetimeScope, eventBusSubcriptionsManager, queueName);
+            return new RabbitMQSubscriber(rabbitMQPersistentConnection, logger, iLifetimeScope, eventBusSubcriptionsManager, queueName);
         }
 
         public static void ConfigureEventBusSubscriber(IApplicationBuilder app)
@@ -68,10 +68,10 @@ namespace ConsumerMicroservice
         {
             var rabbitMQPersistentConnection = serviceProvider.GetRequiredService<IRabbitMQPersistentConnection>();
             var iLifetimeScope = serviceProvider.GetRequiredService<ILifetimeScope>();
-            var logger = serviceProvider.GetRequiredService<ILogger<EventBusRabbitMQSubscriber>>();
+            var logger = serviceProvider.GetRequiredService<ILogger<RabbitMQSubscriber>>();
             var eventBusSubcriptionsManager = serviceProvider.GetRequiredService<IEventBusDeadLetterSubscriptionsManager>();
 
-            return new EventBusRabbitMQDeadLetterSubscriber(rabbitMQPersistentConnection, logger, iLifetimeScope, eventBusSubcriptionsManager);
+            return new RabbitMQDeadLetterSubscriber(rabbitMQPersistentConnection, logger, iLifetimeScope, eventBusSubcriptionsManager);
         }
 
         public static void ConfigureEventBusDeadLetterSubscriber(IApplicationBuilder app)

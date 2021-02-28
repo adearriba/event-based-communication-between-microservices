@@ -8,7 +8,7 @@ using EventBus.Events;
 using EventBus.Extensions;
 using EventBus.Interfaces;
 using EventBus.SubscriptionManager;
-using EventBusRabbitMQ.Connections;
+using EventBus.RabbitMQ.Connections;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Polly;
@@ -17,24 +17,24 @@ using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using RabbitMQ.Client.Exceptions;
 
-namespace EventBusRabbitMQ
+namespace EventBus.RabbitMQ
 {
-    public class EventBusRabbitMQ : IEventBus, IDisposable
+    public class RabbitMQEventBus : IEventBus, IDisposable
     {
         const string AUTOFAC_SCOPE_NAME = "rabbitmq_event_bus";
 
         private readonly IRabbitMQPersistentConnection _persistentConnection;
-        private readonly ILogger<EventBusRabbitMQ> _logger;
+        private readonly ILogger<RabbitMQEventBus> _logger;
         private readonly IEventBusSubscriptionsManager _subsManager;
         private readonly ILifetimeScope _autofac;
-        private readonly EventBusSettings _settings;
+        private readonly RabbitMQSettings _settings;
         private readonly int _retryCount;
         private IModel _consumerChannel;
         private string _queueName;
         
-        public EventBusRabbitMQ(
+        public RabbitMQEventBus(
             IRabbitMQPersistentConnection persistentConnection, 
-            ILogger<EventBusRabbitMQ> logger,
+            ILogger<RabbitMQEventBus> logger,
             ILifetimeScope autofac, 
             IEventBusSubscriptionsManager subsManager, 
             string queueName = null, int retryCount = 5)
@@ -46,7 +46,7 @@ namespace EventBusRabbitMQ
             _queueName = queueName;
             _autofac = autofac;
             _retryCount = retryCount;
-            _settings = EventBusSettings.GetInstance();
+            _settings = RabbitMQSettings.GetInstance();
 
             _consumerChannel = CreateConsumerChannel();
             _subsManager.OnEventRemoved += SubsManager_OnEventRemoved;
