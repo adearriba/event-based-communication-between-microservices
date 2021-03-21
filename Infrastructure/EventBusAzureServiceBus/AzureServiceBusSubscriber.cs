@@ -88,7 +88,8 @@ namespace EventBus.AzureServiceBus
 
         public void Dispose()
         {
-            throw new NotImplementedException();
+            _persistentConnection.Dispose();
+            _subsManager.Clear();
         }
 
         private void RegisterSubscriptionClientMessageHandler()
